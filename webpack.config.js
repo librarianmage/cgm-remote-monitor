@@ -2,6 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 const MomentLocalesPlugin = require('moment-locales-webpack-plugin');
 
+
 var pluginArray = [];
 
 var sourceMapType = 'source-map';
