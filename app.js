@@ -122,30 +122,12 @@ function create (env, ctx) {
 
   app.get("/sw.js", (req, res) => {
     res.setHeader('Content-Type', 'application/javascript');
-    if (process.env.NODE_ENV !== 'development') {
-      res.setHeader('Last-Modified', lastModified.toUTCString());
-    }
     res.send(ejs.render(fs.readFileSync(
       require.resolve(`${__dirname}/views/service-worker.js`),
       { encoding: 'utf-8' }),
       { locals: app.locals}
      ));
   });
-
-  // Allow static resources to be cached for week
-  var maxAge = 7 * 24 * 60 * 60 * 1000;
-
-  if (process.env.NODE_ENV === 'development') {
-    maxAge = 1;
-    console.log('Development environment detected, setting static file cache age to 1 second');
-  }
-
-  var staticFiles = express.static(env.static_files, {
-    maxAge
-  });
-
-  // serve the static content
-  app.use(staticFiles);
 
   if (ctx.bootErrors && ctx.bootErrors.length > 0) {
     const bootErrorView = require('./lib/server/booterror')(env, ctx);
@@ -245,10 +227,6 @@ function create (env, ctx) {
     limit: 1048576 * 50
   }), apiRoot);
 
-  app.use('/api', bodyParser({
-    limit: 1048576 * 50
-  }), apiRoot);
-
   app.use('/api/v1', bodyParser({
     limit: 1048576 * 50
   }), api);
@@ -276,6 +254,40 @@ function create (env, ctx) {
   app.get('/swagger.yaml', function(req, res) {
     res.sendFile(__dirname + '/swagger.yaml');
   });
+
+  /* // FOR DEBUGGING MEMORY LEEAKS
+  if (env.settings.isEnabled('dumps')) {
+    var heapdump = require('heapdump');
+    app.get('/api/v2/dumps/start', function(req, res) {
+      var path = new Date().toISOString() + '.heapsnapshot';
+      path = path.replace(/:/g, '-');
+      console.info('writing dump to', path);
+      heapdump.writeSnapshot(path);
+      res.send('wrote dump to ' + path);
+    });
+  }
+  */
+
+  // app.get('/package.json', software);
+
+  // Allow static resources to be cached for week
+  var maxAge = 7 * 24 * 60 * 60 * 1000;
+
+  if (process.env.NODE_ENV === 'development') {
+    maxAge = 1;
+    console.log('Development environment detected, setting static file cache age to 1 second');
+
+    app.get('/nightscout.appcache', function(req, res) {
+      res.sendStatus(404);
+    });
+  }
+
+  var staticFiles = express.static(env.static_files, {
+    maxAge
+  });
+
+  // serve the static content
+  app.use(staticFiles);
 
   // API docs
 
