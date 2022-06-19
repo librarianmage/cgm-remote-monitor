@@ -245,6 +245,10 @@ function create (env, ctx) {
     limit: 1048576 * 50
   }), apiRoot);
 
+  app.use('/api', bodyParser({
+    limit: 1048576 * 50
+  }), apiRoot);
+
   app.use('/api/v1', bodyParser({
     limit: 1048576 * 50
   }), api);

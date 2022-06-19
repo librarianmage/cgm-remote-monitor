@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/html">
+<html>
 
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -40,7 +40,7 @@
       <div id="staleTime"></div>
     </div>
   </main>
-  <script src="<%= locals.bundle %>/js/bundle.clock.js"></script>
+  <script src="<%= locals.bundle %>/js/bundle.clock.js?v=<%= locals.cachebuster %>"></script>
 
   <script type="text/javascript">
     var clockFace = "<%= face  %>"; // can now be used in scripts
@@ -69,7 +69,7 @@
     script.src = src;
 
     document.head.appendChild(script); //or something of the likes
-    <%if (face !== 'config') { %>
+
     var buttonVisible = true;
 
     function hideClose () {
@@ -99,11 +99,8 @@
     window.addEventListener('click', function() {
       showClose();
     });
-    <% } %>
+
   </script>
-  <%if (face == 'config') { %>
-  <%- include('clock-config.html', {}); %>
-  <% } %>
 </body>
 
 </html>
